@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
+    <link rel="icon" href="image/ok_favicon.ico" />
+    <title>绘图</title>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="./css/elementUi.css" />
+
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background-color: rgb(80, 80, 80);
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+
+        .box {
+            display: flex;
+            flex-flow: row nowrap;
+            padding: 50px;
+            width: 1150px;
+            margin: 0 auto
+        }
+
+        .scrollbarBox {
+
+            height: 1024px;
+        }
+
+        .scrollbar {
+            position: relative;
+            top: 63px;
+            width: calc(100% - 1024px);
+        }
+
+        .container {
+            width: 1024px;
+            margin-right: 20px;
+        }
+
+        .image-slot {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            background: rgb(88, 123, 123);
+            color: #c2c7cf;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div v-cloak class="box" v-loading="loading" element-loading-text="拼命加载中">
+            <div class="container">
+                <el-form :model="quesForm" ref="form" :inline="true" size="normal" @submit.native.prevent>
+                    <el-form-item>
+                        <el-input style="width: 929px;" autosize type="textarea" v-model="quesForm.prompt"
+                            placeholder="生成名称"></el-input>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-button type="primary" native-type="submit" @click="getImgData" size="small">生成</el-button>
+                    </el-form-item>
+                </el-form>
+
+                <el-image style="width: 1024px; height: 1024px" :src="imgSrc" fit="contain">
+                    <div slot="error" class="image-slot">
+                        请输入关键词，点击生成
+                    </div>
+                </el-image>
+            </div>
+            <div class="scrollbar">
+                <el-scrollbar class="right-scrollbar">
+                    <div class="scrollbarBox">
+                        <el-image style="width: 150px; height: 150px" v-for="url in imgSrcList" :key="url" fit="contain"
+                            :src="url" :preview-src-list="imgSrcList">
+                        </el-image>
+                    </div>
+
+                </el-scrollbar>
+            </div>
+        </div>
+        <script src="./js/axios.min.js"></script>
+        <script src="./js/vue.js"></script>
+        <!-- 引入组件库 -->
+        <script src="./js/element-ui.js"></script>
+        <script>
+            new Vue({
+                el: "#app",
+                data: function () {
+                    return {
+                        imgSrc: '',
+                        imgSrcList: [],
+                        loading: false,
+                        quesForm: {
+                            prompt: '',
+                        },
+                    };
+                },
+                created() { },
+                destroyed() { },
+                mounted() {
+                    this.imgSrcList = JSON.parse(localStorage.getItem("imgSrcList")) || [];
+                    console.log(this.imgSrcList, 'this.imgSrcList')
+                },
+                methods: {
+                    getImgData() {
+                        this.loading = true
+                        // # sourceMappingURL=axios.min.js.map
+                        axios.get('http://124.156.226.86:8761/generate-image', {
+
+                            params: { prompt: this.quesForm.prompt },
+                        })
+                            .then((res) => {
+                                this.loading = false
+                                console.log(res.data.data, 'res.data.data')
+
+                            }).catch(err => {
+                                console.log(err, 'err')
+                                this.loading = false
+                            })
+
+                        // this.imgSrc = "https://oaidalleapiprodscus.blob.core.windows.net/private/org-HLU43IqIy4xMgC6e3DwEpJAd/user-Mv8hmasr6nZC5zEhHVhHPD8u/img-cQqbi19NzY4BHjkZ60pKGhkf.png?st=2023-05-05T01%3A26%3A28Z&se=2023-05-05T03%3A26%3A28Z&sp=r&sv=2021-08-06&sr=b&rscd=inline&rsct=image/png&skoid=6aaadede-4fb3-4698-a8f6-684d7786b067&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2023-05-04T17%3A14%3A11Z&ske=2023-05-05T17%3A14%3A11Z&sks=b&skv=2021-08-06&sig=N9klxZ2rVDzgqQ34EXazLwmiho03JHnYdgucyRL2Mik%3D"
+                        // console.log(localStorage.getItem("imgSrcList"), 'localStorage.getItem')
+                        // this.imgSrcList.push(this.imgSrc)
+                        // localStorage.setItem("imgSrcList", JSON.stringify(this.imgSrcList))
+                    },
+
+
+                }
+            });
+        </script>
+</body>
+
+</html>
